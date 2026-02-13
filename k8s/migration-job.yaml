@@ -12,7 +12,7 @@ spec:
         - name: registry-credentials
       containers:
         - name: migrate
-          image: registry.homelab.alamin.rocks/niyyah/api:latest
+          image: gitlab-registry.homelab.alamin.rocks/niyyah/app/api:latest
           command: ["alembic", "upgrade", "head"]
           envFrom:
             - secretRef:

@@ -1,0 +1,45 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  REGISTRY: gitlab-registry.homelab.alamin.rocks/niyyah/app
+
+.build:
+  stage: build
+  image: docker:27
+  tags: [homelab]
+  services:
+    - docker:27-dind
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+    DOCKER_HOST: tcp://localhost:2375
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+
+build:api:
+  extends: .build
+  script:
+    - docker build -t $REGISTRY/api:latest -t $REGISTRY/api:$CI_COMMIT_SHORT_SHA apps/api/
+    - docker push $REGISTRY/api --all-tags
+
+build:web:
+  extends: .build
+  script:
+    - docker build -t $REGISTRY/web:latest -t $REGISTRY/web:$CI_COMMIT_SHORT_SHA apps/web/
+    - docker push $REGISTRY/web --all-tags
+
+deploy:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  tags: [homelab]
+  needs: ["build:api", "build:web"]
+  script:
+    - kubectl rollout restart deployment/niyyah-api -n niyyah
+    - kubectl rollout restart deployment/niyyah-web -n niyyah
+    - kubectl rollout status deployment/niyyah-api -n niyyah --timeout=120s
+    - kubectl rollout status deployment/niyyah-web -n niyyah --timeout=120s
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"

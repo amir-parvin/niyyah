@@ -59,7 +59,7 @@ spec:
         - name: registry-credentials
       containers:
         - name: api
-          image: registry.homelab.alamin.rocks/niyyah/api:latest
+          image: gitlab-registry.homelab.alamin.rocks/niyyah/app/api:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8000
@@ -141,7 +141,7 @@ spec:
         - name: registry-credentials
       containers:
         - name: web
-          image: registry.homelab.alamin.rocks/niyyah/web:latest
+          image: gitlab-registry.homelab.alamin.rocks/niyyah/app/web:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
