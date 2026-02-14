@@ -23,13 +23,13 @@ variables:
 build:api:
   extends: .build
   script:
-    - docker build -t $REGISTRY/api:latest -t $REGISTRY/api:$CI_COMMIT_SHORT_SHA apps/api/
+    - docker build --dns 8.8.8.8 -t $REGISTRY/api:latest -t $REGISTRY/api:$CI_COMMIT_SHORT_SHA apps/api/
     - docker push $REGISTRY/api --all-tags
 
 build:web:
   extends: .build
   script:
-    - docker build -t $REGISTRY/web:latest -t $REGISTRY/web:$CI_COMMIT_SHORT_SHA apps/web/
+    - docker build --dns 8.8.8.8 -t $REGISTRY/web:latest -t $REGISTRY/web:$CI_COMMIT_SHORT_SHA apps/web/
     - docker push $REGISTRY/web --all-tags
 
 deploy:
